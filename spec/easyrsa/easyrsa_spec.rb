@@ -1,9 +1,9 @@
 require File.join(File.dirname(__FILE__), '..', 'spec_helper')
 
-describe EasyRSA::Config, 'Configure' do
+describe EasyRSA::Config, 'Should' do
   include_context "shared environment"
 
-  it 'should throw error when missing required configure parameters' do
+  it 'throw error when missing required configure parameters' do
 
     expect {
       EasyRSA.configure do |issuer|
@@ -17,7 +17,7 @@ describe EasyRSA::Config, 'Configure' do
 
   end
 
-  it 'should configure correctly' do
+  it 'configure correctly' do
 
     expect {
       EasyRSA.configure do |issuer|

@@ -1,5 +1,5 @@
 runtime: ruby21
 build_gem: |
   rm -rf *.gem
-  gem build vectra.gemspec
+  gem build easyrsa.gemspec
   gem push *.gem
