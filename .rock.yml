@@ -1,0 +1,5 @@
+runtime: ruby21
+build_gem: |
+  rm -rf *.gem
+  gem build vectra.gemspec
+  gem push *.gem
