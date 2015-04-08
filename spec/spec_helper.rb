@@ -16,6 +16,10 @@ RSpec.shared_context "shared environment", :a => :b do
     @company = 'Mike Mackintosh'
     @orgunit = 'EasyRSA Gem Test'
 
+    @ca_key = File.join(File.dirname(__FILE__), 'cakey.pem')
+    @ca_key_pass = 'aaaa'
+    @ca_cert = File.join(File.dirname(__FILE__), 'cacert.pem')
+
   end
 
 end
