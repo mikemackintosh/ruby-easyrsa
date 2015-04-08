@@ -7,7 +7,7 @@ require 'easyrsa/version'
 Gem::Specification.new do |s|
 
   s.name        = 'easyrsa'
-  s.version     = easyrsa::VERSION
+  s.version     = EasyRSA::VERSION
   s.date        = '2015-04-07'
   s.summary     = "EasyRSA interface for generating OpenVPN certificates"
   s.description = "Easily generate OpenVPN certificates without needing the easyrsa packaged scripts"
