@@ -6,11 +6,25 @@ module EasyRSA
     class BitLengthToWeak < RuntimeError ; end
     class MissingParameter < RuntimeError ; end
 
-    def initialize(ca_crt, ca_key, id, email, bits=4096, &block)
-      
+    def initialize(ca_crt, ca_key, id=nil, email=nil, bits=4096, &block)
+
+      # ID to generate cert for
+      if id.eql? nil
+        raise EasyRSA::Certificate::MissingParameter,
+          "Please provide an 'id', also known as a subject, for the certificates' CN field."
+      end
+      @id = id
+
+       # ID to generate cert for
+      if email.eql? nil
+        raise EasyRSA::Certificate::MissingParameter,
+          "Please provide an 'email', also known as a subject, for the certificates' emailAddress field."
+      end
+      @email = email
+
       # Validate the existence of the ca_cert file
       unless File.exist? ca_crt
-        raise EasyRSA::Generate::UnableToReadCACert,
+        raise EasyRSA::Certificate::UnableToReadCACert,
           "Certificate Authority Certificate does not exist or is not readable: '#{ca_crt}'. " +
           "Please check it's existence and permissions"
       end
@@ -18,7 +32,7 @@ module EasyRSA
 
       # Validate the existence of the ca_key file
       unless File.exist? ca_key
-        raise EasyRSA::Generate::UnableToReadCAKey,
+        raise EasyRSA::Certificate::UnableToReadCAKey,
           "Certificate Authority Key does not exist or is not readable: '#{ca_key}'. " +
           "Please check it's existence and permissions"
       end
@@ -31,40 +45,42 @@ module EasyRSA
       end      
       @key = OpenSSL::PKey::RSA.new(bits)
 
-      # ID to generate cert for
-      if id.eql? nil
-        raise EasyRSA::Generate::MissingParameter,
-          "Please provide an 'id', also known as a subject, for the certificates' CN field."
-      end
-      @id = id
-
-       # ID to generate cert for
-      if email.eql? nil
-        raise EasyRSA::Generate::MissingParameter,
-          "Please provide an 'email', also known as a subject, for the certificates' emailAddress field."
-      end
-      @email = email
-
       # Instantiate a new certificate
       @cert = OpenSSL::X509::Certificate.new
+
+      # This cert should never be valid before now
+      @cert.not_before = Time.now
+
+      # Set it to version
+      @cert.version = 2     
 
       instance_eval(&block) if block_given?
     end
 
     def generate(validfor=10)
   
-      @cert.not_before = Time.now
+      # Set the expiration date
       @cert.not_after = years_from_now(validfor)
-      @cert.public_key = @key.public_key
-      @cert.serial = gen_serial
-      @cert.version = 2
-      
-      gen_subject
-      gen_issuer
-      add_extensions
-      sign
 
-      { 'key': @key.to_pem, 'crt': @cert.to_pem }
+      # Add the public key
+      @cert.public_key = @key.public_key
+
+      # Generate and assign the serial
+      @cert.serial = gen_serial
+      
+      # Generate subject
+      gen_subject
+
+      # Generate issuer
+      gen_issuer
+
+      # Add extensions
+      add_extensions
+
+      # Sign the cert
+      sign_cert_with_ca
+
+      { key: @key.to_pem, crt: @cert.to_pem }
 
     end
 
@@ -99,21 +115,20 @@ module EasyRSA
           ef.create_extension('keyUsage', 'digitalSignature')
         ]
 
-        ef = cert_extension_factory
         @cert.add_extension ef.create_extension('authorityKeyIdentifier',
                                                 'keyid,issuer:always')
       end
 
       def gen_serial
         # Must always be unique, so we do date and @id's chars
-        "#{Time.now.strftime("%Y%m%d%H%M%S")}#{@id.unpack('c*').join.to_i}"
+        "#{Time.now.strftime("%Y%m%d%H%M%S")}#{@id.unpack('c*').join.to_i}".to_i
       end
 
       def years_from_now(i = 10)
         Time.now + i * 365 * 24 * 60 * 60
       end
 
-      def sign
+      def sign_cert_with_ca
         @cert.sign @ca_key, OpenSSL::Digest::SHA256.new
       end
 
