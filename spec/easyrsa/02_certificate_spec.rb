@@ -49,14 +49,26 @@ describe EasyRSA::Certificate, 'Should' do
   it 'return keys successfully' do
 
     easyrsa = EasyRSA::Certificate.new(@ca_cert, @ca_key, 'mike', 'mike@ruby-easyrsa.gem')
-    key, cert = easyrsa.generate
+    g = easyrsa.generate
 
-    expect(key).to include('BEGIN RSA PRIVATE KEY')
-    expect(cert).to include('BEGIN CERTIFICATE')    
-
+    expect(g[:key]).to include('BEGIN RSA PRIVATE KEY')
+    expect(g[:crt]).to include('BEGIN CERTIFICATE')    
 
   end
 
+
+  it 'return successful in a block as well' do
+    g = {}
+    EasyRSA::Certificate.new(@ca_cert, @ca_key, 'mike', 'mike@ruby-easyrsa.gem') do |c|
+      c.generate.each do |k, v|
+        g[k] = v
+      end
+    end
+
+    expect(g[:key]).to include('BEGIN RSA PRIVATE KEY')
+    expect(g[:crt]).to include('BEGIN CERTIFICATE')    
+
+  end
 
 end
 

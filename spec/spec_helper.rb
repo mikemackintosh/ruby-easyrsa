@@ -20,6 +20,9 @@ RSpec.shared_context "shared environment", :a => :b do
     @ca_key_pass = 'aaaa'
     @ca_cert = File.join(File.dirname(__FILE__), 'cacert.pem')
 
+    @client_id = "sexyhorse"
+    @client_email = "sexyhorse@zyp.io"
+
   end
 
 end
