@@ -5,6 +5,8 @@ require 'easyrsa/version'
 require 'easyrsa/config'
 require 'easyrsa/certificate'
 require 'easyrsa/ca'
+#require 'easyrsa/cli'
+#require 'easyrsa/revoke'
 
 module EasyRSA
 

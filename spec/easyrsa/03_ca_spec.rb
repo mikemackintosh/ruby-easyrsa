@@ -46,7 +46,6 @@ describe EasyRSA::CA, 'Should' do
 
   end
 
-
   it 'return successful in a block as well' do
     g = {}
     EasyRSA::CA.new("CN=ca/DC=example") do |c|

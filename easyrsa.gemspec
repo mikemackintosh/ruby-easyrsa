@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
 
   s.name        = 'easyrsa'
   s.version     = EasyRSA::VERSION
-  s.date        = '2015-04-07'
+  s.date        = '2015-04-28'
   s.summary     = "EasyRSA interface for generating OpenVPN certificates"
   s.description = "Easily generate OpenVPN certificates without needing the easyrsa packaged scripts"
   s.authors     = ["Mike Mackintosh"]
@@ -24,7 +24,6 @@ Gem::Specification.new do |s|
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
 
   s.add_dependency 'openssl'
-  s.add_dependency 'fattr'
   s.add_dependency 'paint'
   s.add_dependency 'methadone'
 
