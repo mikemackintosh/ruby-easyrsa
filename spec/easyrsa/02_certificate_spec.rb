@@ -70,6 +70,13 @@ describe EasyRSA::Certificate, 'Should' do
 
   end
 
+  it 'gets generates a valid serial' do
+    easyrsa = EasyRSA::Certificate.new(@ca_cert, @ca_key, 'mike', 'mike@ruby-easyrsa.gem')
+    g = easyrsa.generate
+    r = OpenSSL::X509::Certificate.new g[:crt]
+    expect("#{r.serial}").to include("#{Time.now.year}")
+  end  
+
 end
 
 @client_id = "sexyhorse"
