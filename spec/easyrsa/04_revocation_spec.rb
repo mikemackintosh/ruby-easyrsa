@@ -28,9 +28,10 @@ describe EasyRSA::Revoke, 'Should' do
   end
 
   it 'throw error if no CA root is provided' do
+
     easyrsa = EasyRSA::Certificate.new(@ca_cert, @ca_key, 'mike', 'mike@ruby-easyrsa.gem')
     g = easyrsa.generate
-    r = OpenSSL::X509::Certificate.new g[:crt]
+
     expect{
       r = EasyRSA::Revoke.new g[:crt]
       r.revoke!
@@ -41,8 +42,6 @@ describe EasyRSA::Revoke, 'Should' do
 
     easyrsa = EasyRSA::Certificate.new(@ca_cert, @ca_key, 'mike', 'mike@ruby-easyrsa.gem')
     g = easyrsa.generate
-
-    r = OpenSSL::X509::Certificate.new g[:crt]
 
     expect{
       r = EasyRSA::Revoke.new g[:crt]
@@ -56,12 +55,10 @@ describe EasyRSA::Revoke, 'Should' do
     easyrsa = EasyRSA::Certificate.new(@ca_cert, @ca_key, 'mike', 'mike@ruby-easyrsa.gem')
     g = easyrsa.generate
 
-    r = OpenSSL::X509::Certificate.new g[:crt]
-
-    expect{
-      r = EasyRSA::Revoke.new g[:crt]
-      crl = r.revoke! @ca_key
-    }.to include('BEGIN X509 CRL')
+    r = EasyRSA::Revoke.new g[:crt]
+    crl = r.revoke! @ca_key
+    
+    expect(crl).to include('BEGIN X509 CRL')
   end
 
 end
