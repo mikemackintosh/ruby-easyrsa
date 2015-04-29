@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper')
 describe EasyRSA::Config, 'Should' do
   include_context "shared environment"
 
-  it 'throw error when missing required configure parameters' do
+  it 'should throw error when missing required configure parameters' do
 
     expect {
       EasyRSA.configure do |issuer|
@@ -17,7 +17,7 @@ describe EasyRSA::Config, 'Should' do
 
   end
 
-  it 'configure correctly' do
+  it 'should configure correctly in block format' do
 
     expect {
       EasyRSA.configure do |issuer|
@@ -28,6 +28,20 @@ describe EasyRSA::Config, 'Should' do
         issuer.company = @company
         issuer.orgunit = @orgunit
       end
+    }.not_to raise_error
+
+  end
+
+  it 'should configure correctly when in hash form' do
+
+    expect {
+      config = { email: @email,
+        server: @server,
+        country: @country,
+        city: @city,
+        company: @company,
+        orgunit: @orgunit }
+      EasyRSA::Config.from_hash config
     }.not_to raise_error
 
   end
