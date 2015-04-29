@@ -65,3 +65,18 @@ ca = EasyRSA::CA.new('CN=openvpn/DC=example/DC=com')
 g = ca.generate
  #=> [:key => '...RSA KEY...', :crt => '...CERTIFICATE...']
 ```
+
+
+### Revoking Certificates
+
+The following can be used to create revoke a certificate:
+
+```ruby
+easyrsa = EasyRSA::Certificate.new(@ca_cert, @ca_key, 'mike', 'mike@ruby-easyrsa.gem')
+g = easyrsa.generate
+
+r = EasyRSA::Revoke.new g[:crt]
+crl = r.revoke! @ca_key
+ #=> -----BEGIN X509 CRL-----
+ #   MIIBjTCB9wIBATANBgkqhkiG9w0BAQsFADCBpDELMAkGA1UEBhMCVVMxETAPBgNV
+```
