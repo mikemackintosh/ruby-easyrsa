@@ -55,3 +55,13 @@ g = easyrsa.generate
 ```
 
 >**Note** `ca_cert` and `ca_key` should point to the same certificate and keys that are included in your OpenVPN configuration file.
+
+## Generate the CA files
+
+The following can be used to create a Certificate Authority:
+
+```ruby
+ca = EasyRSA::CA.new('CN=openvpn/DC=example/DC=com')
+g = ca.generate
+ #=> [:key => '...RSA KEY...', :crt => '...CERTIFICATE...']
+```
