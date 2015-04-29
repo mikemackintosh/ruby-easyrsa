@@ -25,10 +25,11 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'openssl'
   s.add_dependency 'fattr'
+  s.add_dependency 'paint'
+  s.add_dependency 'methadone'
 
   s.add_development_dependency "bundler"
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec"
-  s.add_development_dependency "webmock"
 
 end

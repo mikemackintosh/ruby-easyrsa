@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), '..', 'spec_helper')
 
-describe EasyRSA::Certificate, 'Should' do
+describe EasyRSA::CA, 'Should' do
   include_context "shared environment"
 
   before do
@@ -15,40 +15,30 @@ describe EasyRSA::Certificate, 'Should' do
   end
 
   it 'throw error when arguments are missing' do
-
     expect {
-      EasyRSA::Certificate.new('ca.crt', 'ca.key')
-    }.to raise_error(EasyRSA::Certificate::MissingParameter)
-
-  end
-
-  it 'throw error when invalid ca cert is passed' do
-
-    expect {
-      EasyRSA::Certificate.new('ca.crt', 'ca.key', 'blah', 'blah@blah')
-    }.to raise_error(EasyRSA::Certificate::UnableToReadCACert)
-
+      EasyRSA::CA.new
+    }.to raise_error(EasyRSA::CA::MissingParameter)
   end
 
   it 'throw error when invalid ca key is passed' do
 
     expect {
-      EasyRSA::Certificate.new('ca.crt', 'ca.key', 'blah', 'blah@blah')
-    }.to raise_error(EasyRSA::Certificate::UnableToReadCACert)
+      EasyRSA::CA.new('sadfsdf')
+    }.to raise_error(EasyRSA::CA::InvalidCAName)
 
   end
 
   it 'throw error when bit length is too weak' do
 
     expect {
-      EasyRSA::Certificate.new(@ca_cert, @ca_key, 'blah', 'blah@blah', 512)
-    }.to raise_error(EasyRSA::Certificate::BitLengthToWeak)
+      EasyRSA::CA.new("CN=ca/DC=example", 512)
+    }.to raise_error(EasyRSA::CA::BitLengthToWeak)
 
   end
 
   it 'return keys successfully' do
 
-    easyrsa = EasyRSA::Certificate.new(@ca_cert, @ca_key, 'mike', 'mike@ruby-easyrsa.gem')
+    easyrsa = EasyRSA::CA.new("CN=ca/DC=example")
     g = easyrsa.generate
 
     expect(g[:key]).to include('BEGIN RSA PRIVATE KEY')
@@ -59,7 +49,7 @@ describe EasyRSA::Certificate, 'Should' do
 
   it 'return successful in a block as well' do
     g = {}
-    EasyRSA::Certificate.new(@ca_cert, @ca_key, 'mike', 'mike@ruby-easyrsa.gem') do |c|
+    EasyRSA::CA.new("CN=ca/DC=example") do |c|
       c.generate.each do |k, v|
         g[k] = v
       end
@@ -71,6 +61,3 @@ describe EasyRSA::Certificate, 'Should' do
   end
 
 end
-
-@client_id = "sexyhorse"
-    @client_email = "sexyhorse@zyp.io"

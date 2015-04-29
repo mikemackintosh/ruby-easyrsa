@@ -1,19 +1,23 @@
 module EasyRSA
   class CA
 
-    class UnableToCreateCACert < RuntimeError ; end
-    class UnableToCreateCAKey < RuntimeError ; end
-    class BitLengthToWeak < RuntimeError ; end
-    class MissingParameter < RuntimeError ; end
+    class BitLengthToWeak < RuntimeError; end
+    class InvalidCAName < RuntimeError; end
+    class MissingParameter < RuntimeError; end
 
-    def initialize(ca_name, bits=4096, &block)
+    def initialize(ca_name=nil, bits=4096, &block)
 
     # CA Name to generate cert for
-      if ca_name.eql? nil
-        raise EasyRSA::CA::MissingParameter,
+      begin
+        if ca_name.eql? nil
+          raise EasyRSA::CA::MissingParameter,
+            "Please provide a 'ca name', for the certificates' CN field. This should be in the format, 'CN=ca/DC=example/DC=com' for 'ca.example.com'"
+        end
+        @ca_name = OpenSSL::X509::Name.parse ca_name
+      rescue TypeError => e
+        fail EasyRSA::CA::InvalidCAName, 
           "Please provide a 'ca name', for the certificates' CN field. This should be in the format, 'CN=ca/DC=example/DC=com' for 'ca.example.com'"
       end
-      @ca_name = OpenSSL::X509::Name.parse ca_name
     
     # Generate Private Key
       if bits < 2048
