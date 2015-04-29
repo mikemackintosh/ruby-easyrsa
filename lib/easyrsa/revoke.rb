@@ -40,11 +40,15 @@ module EasyRSA
 
     # Get cert details if it's in a file
       unless cakey.is_a? OpenSSL::PKey::RSA
-        begin
-          cakey = OpenSSL::PKey::RSA.new File.read cakey
-        rescue OpenSSL::PKey::RSAError => e
-          fail EasyRSA::Revoke::InvalidCARootPrivateKey,
-            'This is not a valid Private key file.'
+        if cakey.include?('BEGIN RSA PRIVATE KEY')
+          cakey = OpenSSL::PKey::RSA.new cakey
+        else
+          begin
+            cakey = OpenSSL::PKey::RSA.new File.read cakey
+          rescue OpenSSL::PKey::RSAError => e
+            fail EasyRSA::Revoke::InvalidCARootPrivateKey,
+              'This is not a valid Private key file.'
+          end
         end
       end
 
