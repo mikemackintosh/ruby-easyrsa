@@ -60,7 +60,7 @@ module EasyRSA
     def generate(validfor=10)
   
       # Set the expiration date
-      @cert.not_after = years_from_now(validfor)
+      @cert.not_after = EasyRSA::years_from_now(validfor)
 
       # Add the public key
       @cert.public_key = @key.public_key
@@ -122,10 +122,6 @@ module EasyRSA
       def gen_serial
         # Must always be unique, so we do date and @id's chars
         "#{Time.now.strftime("%Y%m%d%H%M%S")}#{@id.unpack('c*').join.to_i}".to_i
-      end
-
-      def years_from_now(i = 10)
-        Time.now + i * 365 * 24 * 60 * 60
       end
 
       def sign_cert_with_ca
