@@ -66,13 +66,13 @@ module EasyRSA
       @cert.public_key = @key.public_key
 
       # Generate and assign the serial
-      @cert.serial = gen_serial
+      @cert.serial = EasyRSA::gen_serial(@id)
       
+      # Generate issuer
+      @cert.issuer = EasyRSA::gen_issuer
+
       # Generate subject
       gen_subject
-
-      # Generate issuer
-      gen_issuer
 
       # Add extensions
       add_extensions
@@ -92,14 +92,6 @@ module EasyRSA
           "L=#{EasyRSA::Config.city}/O=#{EasyRSA::Config.company}/OU=#{EasyRSA::Config.orgunit}/CN=#{@id}/" \
           "name=#{@id}/emailAddress=#{@email}")
       end
-     
-      # Cert issuer details
-      def gen_issuer
-        @cert.issuer = OpenSSL::X509::Name.parse("/C=#{EasyRSA::Config.country}/" \
-          "L=#{EasyRSA::Config.city}/O=#{EasyRSA::Config.company}/OU=#{EasyRSA::Config.orgunit}/" \
-          "CN=#{EasyRSA::Config.server}/name=#{EasyRSA::Config.orgunit}/" \
-          "emailAddress=#{EasyRSA::Config.email}")
-      end
 
       def add_extensions
         ef = OpenSSL::X509::ExtensionFactory.new
@@ -117,11 +109,6 @@ module EasyRSA
 
         @cert.add_extension ef.create_extension('authorityKeyIdentifier',
                                                 'keyid,issuer:always')
-      end
-
-      def gen_serial
-        # Must always be unique, so we do date and @id's chars
-        "#{Time.now.strftime("%Y%m%d%H%M%S")}#{@id.unpack('c*').join.to_i}".to_i
       end
 
       def sign_cert_with_ca

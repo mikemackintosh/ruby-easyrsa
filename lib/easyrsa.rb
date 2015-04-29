@@ -5,7 +5,7 @@ require 'easyrsa/config'
 require 'easyrsa/certificate'
 require 'easyrsa/ca'
 #require 'easyrsa/cli'
-#require 'easyrsa/revoke'
+require 'easyrsa/revoke'
 
 module EasyRSA
 
@@ -28,6 +28,20 @@ module EasyRSA
 # Helper for years from now
   def years_from_now(i = 10)
     Time.now + i * 365 * 24 * 60 * 60
+  end
+
+# Helper for issuer details
+  def gen_issuer
+    OpenSSL::X509::Name.parse("/C=#{EasyRSA::Config.country}/" \
+      "L=#{EasyRSA::Config.city}/O=#{EasyRSA::Config.company}/OU=#{EasyRSA::Config.orgunit}/" \
+      "CN=#{EasyRSA::Config.server}/name=#{EasyRSA::Config.orgunit}/" \
+      "emailAddress=#{EasyRSA::Config.email}")
+  end
+
+# Helper for generating serials
+  def gen_serial(id)
+    # Must always be unique, so we do date and id's chars
+    "#{Time.now.strftime("%Y%m%d%H%M%S")}#{id.unpack('c*').join.to_i}".to_i
   end
 
 end
