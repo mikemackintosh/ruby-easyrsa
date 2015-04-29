@@ -1,5 +1,4 @@
 require 'openssl'
-require 'fattr'
 
 require 'easyrsa/version'
 require 'easyrsa/config'
