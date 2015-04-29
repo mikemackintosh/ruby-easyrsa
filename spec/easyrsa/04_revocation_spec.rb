@@ -98,4 +98,15 @@ CERT
     expect(existing_crl).to_not eql(crl.to_pem)
   end
 
+  it 'should successfully revoke with key in OpenSSL::PKey::RSA format' do
+
+    easyrsa = EasyRSA::Certificate.new(@ca_cert, @ca_key, 'mike', 'mike@ruby-easyrsa.gem')
+    g = easyrsa.generate
+
+    r = EasyRSA::Revoke.new g[:crt]
+    crl = r.revoke! OpenSSL::PKey::RSA.new File.read @ca_key
+
+    expect(crl.to_pem).to include('BEGIN X509 CRL')
+  end
+
 end
