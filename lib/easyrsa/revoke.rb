@@ -6,6 +6,7 @@ module EasyRSA
     class MissingParameter < RuntimeError; end
     class MissingCARootKey < RuntimeError; end
     class InvalidCARootPrivateKey < RuntimeError; end
+    class InvalidCertificateRevocationList < RuntimeError; end
 
   # Lets get revoking 
     def initialize(revoke=nil, &block)
@@ -31,7 +32,7 @@ module EasyRSA
 
     end
 
-    def revoke!(cakey=nil, next_update=36000)
+    def revoke!(cakey=nil, crl=nil, next_update=36000)
       if cakey.nil?
         fail EasyRSA::Revoke::MissingCARootKey,
           'Please provide the root CA cert for the CRL'
@@ -39,11 +40,15 @@ module EasyRSA
 
     # Get cert details if it's in a file
       unless cakey.is_a? OpenSSL::PKey::RSA
-        begin
-          cakey = OpenSSL::PKey::RSA.new File.read cakey
-        rescue OpenSSL::PKey::RSAError => e
-          fail EasyRSA::Revoke::InvalidCARootPrivateKey,
-            'This is not a valid Private key file.'
+        if cakey.include?('BEGIN RSA PRIVATE KEY')
+          cakey = OpenSSL::PKey::RSA.new cakey
+        else
+          begin
+            cakey = OpenSSL::PKey::RSA.new File.read cakey
+          rescue OpenSSL::PKey::RSAError => e
+            fail EasyRSA::Revoke::InvalidCARootPrivateKey,
+              'This is not a valid Private key file.'
+          end
         end
       end
 
@@ -53,8 +58,17 @@ module EasyRSA
           'This is not a valid Private key file.'
       end
 
-    # Create the CRL
-      @crl = OpenSSL::X509::CRL.new
+    # Create or load the CRL
+      unless crl.nil?
+        begin
+          @crl = OpenSSL::X509::CRL.new crl
+        rescue
+          fail EasyRSA::Revoke::InvalidCertificateRevocationList,
+            'Invalid CRL provided.'
+        end
+      else
+        @crl = OpenSSL::X509::CRL.new
+      end
 
     # Add the revoked cert
       @crl.add_revoked(@revoked)
@@ -68,8 +82,12 @@ module EasyRSA
       @crl.issuer = EasyRSA::gen_issuer
 
     # Sign the CRL
-      crl = @crl.sign(cakey, OpenSSL::Digest::SHA256.new)
-      crl
+      @updated_crl = @crl.sign(cakey, OpenSSL::Digest::SHA256.new)
+      @updated_crl
+    end
+
+    def to_pem
+      @updated_crl.to_pem
     end
 
   end

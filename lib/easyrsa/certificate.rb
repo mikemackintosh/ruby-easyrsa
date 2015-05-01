@@ -22,21 +22,36 @@ module EasyRSA
       end
       @email = email
 
-      # Validate the existence of the ca_cert file
-      unless File.exist? ca_crt
-        raise EasyRSA::Certificate::UnableToReadCACert,
-          "Certificate Authority Certificate does not exist or is not readable: '#{ca_crt}'. " +
-          "Please check it's existence and permissions"
+    # Get cert details if it's in a file
+      unless ca_crt.is_a? OpenSSL::X509::Certificate
+        if ca_crt.include?('BEGIN CERTIFICATE')
+          ca_crt = OpenSSL::X509::Certificate.new ca_crt
+        else
+          begin
+            ca_crt = OpenSSL::X509::Certificate.new File.read ca_crt
+          rescue
+            fail EasyRSA::Certificate::UnableToReadCACert,
+              'Invalid CA Certificate.'
+          end
+        end        
       end
-      @ca_cert = OpenSSL::X509::Certificate.new File.read ca_crt
+      @ca_cert = ca_crt      
 
-      # Validate the existence of the ca_key file
-      unless File.exist? ca_key
-        raise EasyRSA::Certificate::UnableToReadCAKey,
-          "Certificate Authority Key does not exist or is not readable: '#{ca_key}'. " +
-          "Please check it's existence and permissions"
+    # Get cert details if it's in a file
+      unless ca_key.is_a? OpenSSL::PKey::RSA
+        if ca_key.include?('BEGIN RSA PRIVATE KEY')
+          ca_key = OpenSSL::PKey::RSA.new ca_key
+        else
+          begin
+            ca_key = OpenSSL::PKey::RSA.new File.read ca_key
+          rescue
+            fail EasyRSA::Certificate::UnableToReadCAKey,
+              'This is not a valid CA Private key file.'
+          end
+        end
       end
-      @ca_key = OpenSSL::PKey::RSA.new File.read ca_key
+      @ca_key = ca_key
+
       
       # Generate Private Key and new Certificate
       if bits < 2048

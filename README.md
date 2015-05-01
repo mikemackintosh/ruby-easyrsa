@@ -44,7 +44,9 @@ EasyRSA.configure do |issuer|
 end
 ```
 
-then use the `EasyRSA::Certificate` class to generate the certificate:
+### Generate a Client Certificate
+
+Use the `EasyRSA::Certificate` class to generate the certificate:
 
 ```ruby
 cn = 'Users Common Name'
