@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), '..', 'spec_helper')
 
 describe EasyRSA::CA, 'Should' do
-  include_context "shared environment"
+  include_context 'shared environment'
 
   before do
     EasyRSA.configure do |issuer|
@@ -31,14 +31,14 @@ describe EasyRSA::CA, 'Should' do
   it 'throw error when bit length is too weak' do
 
     expect {
-      EasyRSA::CA.new("CN=ca/DC=example", 512)
+      EasyRSA::CA.new('CN=ca/DC=example', 512)
     }.to raise_error(EasyRSA::CA::BitLengthToWeak)
 
   end
 
   it 'return keys successfully' do
 
-    easyrsa = EasyRSA::CA.new("CN=ca/DC=example")
+    easyrsa = EasyRSA::CA.new('CN=ca/DC=example')
     g = easyrsa.generate
 
     expect(g[:key]).to include('BEGIN RSA PRIVATE KEY')

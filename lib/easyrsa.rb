@@ -41,7 +41,7 @@ module EasyRSA
 # Helper for generating serials
   def gen_serial(id)
     # Must always be unique, so we do date and id's chars
-    "#{Time.now.strftime("%Y%m%d%H%M%S")}#{id.unpack('c*').join.to_i}".to_i
+    "#{Time.now.strftime('%Y%m%d%H%M%S')}#{id.unpack('c*').join.to_i}".to_i
   end
 
 end
