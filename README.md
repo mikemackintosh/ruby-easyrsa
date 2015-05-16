@@ -82,3 +82,14 @@ crl = r.revoke! @ca_key
  #=> -----BEGIN X509 CRL-----
  #   MIIBjTCB9wIBATANBgkqhkiG9w0BAQsFADCBpDELMAkGA1UEBhMCVVMxETAPBgNV
 ```
+
+### Generating Deffie-Hellman
+
+The following can be used to generate Deffie-Hellman:
+
+```ruby
+easyrsa = EasyRSA::DH.new
+g = easyrsa.generate
+puts g
+ #=> -----BEGIN DH PARAMETERS-----
+```
