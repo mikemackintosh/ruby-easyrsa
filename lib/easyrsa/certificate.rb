@@ -105,7 +105,7 @@ module EasyRSA
       def gen_subject
         @cert.subject = OpenSSL::X509::Name.parse("/C=#{EasyRSA::Config.country}/" \
           "L=#{EasyRSA::Config.city}/O=#{EasyRSA::Config.company}/OU=#{EasyRSA::Config.orgunit}/CN=#{@id}/" \
-          "name=#{@id}/emailAddress=#{@email}")
+          "emailAddress=#{@email}")
       end
 
       def add_extensions
