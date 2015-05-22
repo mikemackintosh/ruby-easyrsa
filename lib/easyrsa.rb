@@ -35,7 +35,7 @@ module EasyRSA
   def gen_issuer
     OpenSSL::X509::Name.parse("/C=#{EasyRSA::Config.country}/" \
       "L=#{EasyRSA::Config.city}/O=#{EasyRSA::Config.company}/OU=#{EasyRSA::Config.orgunit}/" \
-      "CN=#{EasyRSA::Config.server}/name=#{EasyRSA::Config.orgunit}/" \
+      "CN=#{EasyRSA::Config.server}/" \
       "emailAddress=#{EasyRSA::Config.email}")
   end
 
