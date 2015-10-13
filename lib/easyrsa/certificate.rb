@@ -103,9 +103,16 @@ module EasyRSA
 
       # Cert subject for End-User
       def gen_subject
-        @cert.subject = OpenSSL::X509::Name.parse("/C=#{EasyRSA::Config.country}/" \
-          "L=#{EasyRSA::Config.city}/O=#{EasyRSA::Config.company}/OU=#{EasyRSA::Config.orgunit}/CN=#{@id}/" \
-          "emailAddress=#{@email}")
+        subject_name = "/C=#{EasyRSA::Config.country}"
+        subject_name += "/ST=#{EasyRSA::Config.state}" unless !EasyRSA::Config.state || EasyRSA::Config.state.empty?
+        subject_name += "/L=#{EasyRSA::Config.city}"
+        subject_name += "/O=#{EasyRSA::Config.company}"
+        subject_name += "/OU=#{EasyRSA::Config.orgunit}"
+        subject_name += "/CN=#{@id}"
+        subject_name += "/name=#{EasyRSA::Config.name}" unless !EasyRSA::Config.name || EasyRSA::Config.name.empty?
+        subject_name += "/emailAddress=#{@email}"
+
+        @cert.subject = OpenSSL::X509::Name.parse(subject_name)
       end
 
       def add_extensions

@@ -5,7 +5,7 @@ module EasyRSA
     
     extend self
 
-    attr_accessor :email, :server, :country, :city, :company, :orgunit
+    attr_accessor :email, :server, :country, :city, :company, :orgunit, :name, :state
 
     # Configure easyrsa from a hash. This is usually called after parsing a
     # yaml config file such as easyrsa.yaml.

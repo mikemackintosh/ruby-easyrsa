@@ -69,10 +69,17 @@ module EasyRSA
 
     # Cert issuer details
       def gen_issuer
-        @ca_cert.issuer = OpenSSL::X509::Name.parse("/C=#{EasyRSA::Config.country}/" \
-          "L=#{EasyRSA::Config.city}/O=#{EasyRSA::Config.company}/OU=#{EasyRSA::Config.orgunit}/" \
-          "CN=#{EasyRSA::Config.server}/name=#{EasyRSA::Config.orgunit}/" \
-          "emailAddress=#{EasyRSA::Config.email}")
+        name = "/C=#{EasyRSA::Config.country}"
+        name += "/ST=#{EasyRSA::Config.state}" unless !EasyRSA::Config.state || EasyRSA::Config.state.empty?
+        name += "/L=#{EasyRSA::Config.city}"
+        name += "/O=#{EasyRSA::Config.company}"
+        name += "/OU=#{EasyRSA::Config.orgunit}"
+        name += "/CN=#{EasyRSA::Config.server}"
+        name += "/name=#{EasyRSA::Config.name}" unless !EasyRSA::Config.name || EasyRSA::Config.name.empty?
+        name += "/name=#{EasyRSA::Config.orgunit}" if !EasyRSA::Config.name || EasyRSA::Config.name.empty?
+        name += "/emailAddress=#{EasyRSA::Config.email}"
+
+        @ca_cert.issuer = OpenSSL::X509::Name.parse(name)
       end
 
     # Add Extensions needed
