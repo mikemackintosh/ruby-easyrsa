@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), '..', 'spec_helper')
 
 describe EasyRSA::Revoke, 'Should' do
-  include_context "shared environment"
+  include_context 'shared environment'
 
   before do
     EasyRSA.configure do |issuer|
