@@ -36,8 +36,10 @@ First, set your issuer configuration like so:
 ```ruby
 EasyRSA.configure do |issuer|
   issuer.email = 'support@company.com'
+  issuer.name = 'MrKickass'
   issuer.server = 'vpnserver.company.com'
   issuer.country = 'US'
+  issuer.state = 'NY'
   issuer.city = 'New York'
   issuer.company = 'My Company'
   issuer.orgunit = 'IT'
