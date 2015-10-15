@@ -13,8 +13,10 @@ RSpec.shared_context 'shared environment', :a => :b do
     @server = 'easyrsa-gem-test'
     @country = 'US'
     @city = 'New York'
+    @state = 'New York'
     @company = 'Mike Mackintosh'
     @orgunit = 'EasyRSA Gem Test'
+    @name = 'Your mom'
 
     @ca_key = File.join(File.dirname(__FILE__), 'cakey.pem')
     @ca_key_pass = 'aaaa'

@@ -1,10 +1,19 @@
+GEM := $(shell which gem)
+BUNDLE := $(shell which bundle)
+
 all: clear build push
 
 clear:
 	rm -rf *.gem
 
-build:
-	gem build easyrsa.gemspec
+init:
+	$(BUNDLE) install --path=vendor/bundle
 
-push:
-	gem push *.gem
+build:
+	$(GEM) build easyrsa.gemspec
+
+push: build
+	$(GEM) push *.gem
+
+test:
+	$(BUNDLE) exec rake test

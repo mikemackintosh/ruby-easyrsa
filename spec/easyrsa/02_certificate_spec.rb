@@ -73,11 +73,11 @@ KEY
     expect {
       EasyRSA::Certificate.new('ca.crt', 'ca.key', 'blah', 'blah@blah')
     }.to raise_error(EasyRSA::Certificate::UnableToReadCACert)
-    
+
     expect {
       EasyRSA::Certificate.new(cert, 'ca.key', 'blah', 'blah@blah')
     }.to raise_error(EasyRSA::Certificate::UnableToReadCAKey)
-    
+
     expect {
       EasyRSA::Certificate.new(cert, key, 'blah', 'blah@blah')
     }.to_not raise_error
@@ -102,7 +102,7 @@ KEY
     g = easyrsa.generate
 
     expect(g[:key]).to include('BEGIN RSA PRIVATE KEY')
-    expect(g[:crt]).to include('BEGIN CERTIFICATE')    
+    expect(g[:crt]).to include('BEGIN CERTIFICATE')
 
   end
 
@@ -116,7 +116,7 @@ KEY
     end
 
     expect(g[:key]).to include('BEGIN RSA PRIVATE KEY')
-    expect(g[:crt]).to include('BEGIN CERTIFICATE')    
+    expect(g[:crt]).to include('BEGIN CERTIFICATE')
 
   end
 
@@ -125,9 +125,32 @@ KEY
     g = easyrsa.generate
     r = OpenSSL::X509::Certificate.new g[:crt]
     expect("#{r.serial}").to include("#{Time.now.year}")
-  end  
+  end
+
+  before do
+    EasyRSA.configure do |issuer|
+      issuer.email = @email
+      issuer.server = @server
+      issuer.country = @country
+      issuer.state = @state
+      issuer.city = @city
+      issuer.company = @company
+      issuer.name = @name
+    end
+  end
+
+  it 'should allow optional state' do
+    easyrsa = EasyRSA::Certificate.new(@ca_cert, @ca_key, 'mike', 'mike@ruby-easyrsa.gem')
+    g = easyrsa.generate
+    r = OpenSSL::X509::Certificate.new g[:crt]
+    expect(r.subject.to_s).to include(@state)
+  end
+
+  it 'should allow optional name' do
+    easyrsa = EasyRSA::Certificate.new(@ca_cert, @ca_key, 'mike', 'mike@ruby-easyrsa.gem')
+    g = easyrsa.generate
+    r = OpenSSL::X509::Certificate.new g[:crt]
+    expect(r.subject.to_s).to include(@name)
+  end
 
 end
-
-@client_id = "sexyhorse"
-    @client_email = "sexyhorse@zyp.io"
