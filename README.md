@@ -100,5 +100,5 @@ puts g
 
 Many thanks to:
 
-  - @chapmajs
-  - @esaari
+  - [@chapmajs](https://github.com/chapmajs)
+  - [@esaari](https://github.com/esaari)
