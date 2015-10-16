@@ -17,3 +17,5 @@ push: build
 
 test:
 	$(BUNDLE) exec rake test
+
+gem: test build push

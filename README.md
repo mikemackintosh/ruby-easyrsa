@@ -95,3 +95,10 @@ g = easyrsa.generate
 puts g
  #=> -----BEGIN DH PARAMETERS-----
 ```
+
+## Credits
+
+Many thanks to:
+
+  - @chapmajs
+  - @esaari
