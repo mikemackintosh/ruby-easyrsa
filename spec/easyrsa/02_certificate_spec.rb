@@ -153,4 +153,18 @@ KEY
     expect(r.subject.to_s).to include(@name)
   end
 
+  it 'should be a client cert by default' do
+    easyrsa = EasyRSA::Certificate.new(@ca_cert, @ca_key, 'mike', 'mike@ruby-easyrsa.gem')
+    easyrsa.generate
+    r = easyrsa.get_extensions
+    expect(r['nsCertType']).to include("SSL Client, Object Signing")
+  end
+
+  it 'should be a server certificate if set' do
+    easyrsa = EasyRSA::Certificate.new(@ca_cert, @ca_key, 'mike', 'mike@ruby-easyrsa.gem', 2048, EasyRSA::Certificate::Server)
+    easyrsa.generate
+    r = easyrsa.get_extensions
+    expect(r['nsCertType']).to include("SSL Server")
+  end
+
 end

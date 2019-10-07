@@ -1,6 +1,6 @@
 module EasyRSA
   class Certificate
-    
+
     Client = 1
     Server = 2
 
@@ -16,7 +16,7 @@ module EasyRSA
           "Please provide a valid Cert Type, either Client or Server"
       end
       @certtype = certtype
- 
+
       # ID to generate cert for
       if id.eql? nil
         raise EasyRSA::Certificate::MissingParameter,
@@ -42,9 +42,9 @@ module EasyRSA
             fail EasyRSA::Certificate::UnableToReadCACert,
               'Invalid CA Certificate.'
           end
-        end        
+        end
       end
-      @ca_cert = ca_crt      
+      @ca_cert = ca_crt
 
     # Get cert details if it's in a file
       unless ca_key.is_a? OpenSSL::PKey::RSA
@@ -61,12 +61,12 @@ module EasyRSA
       end
       @ca_key = ca_key
 
-      
+
       # Generate Private Key and new Certificate
       if bits < 2048
         raise EasyRSA::Certificate::BitLengthToWeak,
           "Please select a bit length greater than 2048. Default is 4096. You chose '#{bits}'"
-      end      
+      end
       @key = OpenSSL::PKey::RSA.new(bits)
 
       # Instantiate a new certificate
@@ -76,13 +76,13 @@ module EasyRSA
       @cert.not_before = Time.now
 
       # Set it to version
-      @cert.version = 2     
+      @cert.version = 2
 
       instance_eval(&block) if block_given?
     end
 
     def generate(type=Client,validfor=10)
-  
+
       # Set the expiration date
       @cert.not_after = EasyRSA::years_from_now(validfor)
 
@@ -91,7 +91,7 @@ module EasyRSA
 
       # Generate and assign the serial
       @cert.serial = EasyRSA::gen_serial(@id)
-      
+
       # Generate issuer
       @cert.issuer = EasyRSA::gen_issuer
 
@@ -106,6 +106,15 @@ module EasyRSA
 
       { key: @key.to_pem, crt: @cert.to_pem }
 
+    end
+
+    def get_extensions
+      extensions = Hash.new
+      cert = OpenSSL::X509::Certificate.new @cert.to_pem
+      cert.extensions.each do |ext|
+        extensions[ext.oid] = ext.value
+      end
+      extensions
     end
 
     private
@@ -131,16 +140,17 @@ module EasyRSA
 
         @cert.extensions = [
           ef.create_extension('basicConstraints', 'CA:FALSE'),
-          ef.create_extension('nsComment', 'Easy-RSA Generated Certificate'),
           ef.create_extension('subjectKeyIdentifier', 'hash'),
           ef.create_extension('extendedKeyUsage', 'clientAuth'),
           ef.create_extension('keyUsage', 'digitalSignature')
         ]
-        
-        if @certtype == EasyRSA::Certificate::Client
-          ef.create_extension('nsCertType', 'client, objsign')
-        elsif @certtype == EasyRSA::Certificate::Server
-          ef.create_extension('nsCertType', 'server')
+
+        if @certtype.eql? EasyRSA::Certificate::Client
+          @cert.add_extension ef.create_extension('nsComment', 'Easy-RSA Generated Certificate')
+          @cert.add_extension ef.create_extension('nsCertType', 'client, objsign')
+        elsif @certtype.eql? EasyRSA::Certificate::Server
+          @cert.add_extension ef.create_extension('nsComment', 'Easy-RSA Generated Server Certificate')
+          @cert.add_extension ef.create_extension('nsCertType', 'server')
         end
 
         @cert.add_extension ef.create_extension('authorityKeyIdentifier',
