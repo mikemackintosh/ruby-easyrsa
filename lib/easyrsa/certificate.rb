@@ -1,24 +1,33 @@
 module EasyRSA
   class Certificate
+    
+    Client = 1
+    Server = 2
 
     class UnableToReadCACert < RuntimeError ; end
     class UnableToReadCAKey < RuntimeError ; end
     class BitLengthToWeak < RuntimeError ; end
+    class InvalidCertType < RuntimeError ; end
     class MissingParameter < RuntimeError ; end
 
-    def initialize(ca_crt, ca_key, id=nil, email=nil, bits=4096, &block)
-
+    def initialize(ca_crt, ca_key, id=nil, email=nil, bits=4096, certtype=EasyRSA::Certificate::Client, &block)
+      if certtype < 1 || certtype > 2
+        raise EasyRSA::Certificate::InvalidCertType,
+          "Please provide a valid Cert Type, either Client or Server"
+      end
+      @certtype = certtype
+ 
       # ID to generate cert for
       if id.eql? nil
         raise EasyRSA::Certificate::MissingParameter,
-          "Please provide an 'id', also known as a subject, for the certificates' CN field."
+          "Please provide an 'id', also known as a subject, for the certificates' CN field"
       end
       @id = id
 
        # ID to generate cert for
       if email.eql? nil
         raise EasyRSA::Certificate::MissingParameter,
-          "Please provide an 'email', also known as a subject, for the certificates' emailAddress field."
+          "Please provide an 'email', also known as a subject, for the certificates' emailAddress field"
       end
       @email = email
 
@@ -72,7 +81,7 @@ module EasyRSA
       instance_eval(&block) if block_given?
     end
 
-    def generate(validfor=10)
+    def generate(type=Client,validfor=10)
   
       # Set the expiration date
       @cert.not_after = EasyRSA::years_from_now(validfor)
@@ -122,12 +131,17 @@ module EasyRSA
 
         @cert.extensions = [
           ef.create_extension('basicConstraints', 'CA:FALSE'),
-          ef.create_extension('nsCertType', 'client, objsign'),
           ef.create_extension('nsComment', 'Easy-RSA Generated Certificate'),
           ef.create_extension('subjectKeyIdentifier', 'hash'),
           ef.create_extension('extendedKeyUsage', 'clientAuth'),
           ef.create_extension('keyUsage', 'digitalSignature')
         ]
+        
+        if @certtype == EasyRSA::Certificate::Client
+          ef.create_extension('nsCertType', 'client, objsign')
+        elsif @certtype == EasyRSA::Certificate::Server
+          ef.create_extension('nsCertType', 'server')
+        end
 
         @cert.add_extension ef.create_extension('authorityKeyIdentifier',
                                                 'keyid,issuer:always')
